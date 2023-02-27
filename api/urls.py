@@ -5,6 +5,7 @@ from .views import *
 
 
 router = routers.DefaultRouter()
+router.register('users', UserViewSet)
 router.register('meals', MealViewSet)
 router.register('ratings' , RatingViewSet)
 

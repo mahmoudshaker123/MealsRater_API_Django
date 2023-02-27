@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets , permissions
 from .models import *
 from .serializers import *
 from rest_framework.decorators import action
@@ -13,16 +13,27 @@ from rest_framework.permissions import AllowAny , IsAuthenticated , IsAdminUser 
 
 # Create your views here.
 
+
+class UserViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    authentication_classes = [TokenAuthentication,]
+    permission_classes = [AllowAny,]
+    
+
 class MealViewSet(viewsets.ModelViewSet):
     queryset = Meal.objects.all()
     serializer_class = MealSerializer
+    authentication_classes = [TokenAuthentication,]
+    permission_classes = [IsAuthenticated,]
     
     @action(methods=['post'], detail=True)
     def rate_meal(self, request, pk=None):
         if 'stars' in request.data:
             meal = Meal.objects.get(id=pk)
+            user = request.user
             username = request.data['username']
-            user = User.objects.get(username=username)
+            #user = User.objects.get(username=username)
             stars = request.data['stars']
             
             try:
@@ -57,18 +68,13 @@ class MealViewSet(viewsets.ModelViewSet):
             return Response(json, status=status.HTTP_400_BAD_REQUEST)
 
               
-                
-         
-
-    
-
 
 class RatingViewSet(viewsets.ModelViewSet):
     queryset = Rating.objects.all()
     serializer_class = RatingSerializer    
     
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [IsAuthenticated]
+    authentication_classes = [TokenAuthentication , ]
+    permission_classes = [IsAuthenticated, ]
     
     def update(self, request, *args, **kwargs):
         response = {
@@ -83,3 +89,4 @@ class RatingViewSet(viewsets.ModelViewSet):
             }
 
         return Response(response, status=status.HTTP_400_BAD_REQUEST)
+    
