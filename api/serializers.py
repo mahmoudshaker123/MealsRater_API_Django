@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from .models import *
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
 
 
 class MealSerializer(serializers.ModelSerializer):
@@ -17,10 +18,7 @@ class RatingSerializer(serializers.ModelSerializer):
         
         
 class UserSerializer(serializers.ModelSerializer):
-    
-    password = serializers.CharField(write_only=True)
-
-    class Meta :
+    class Meta:
         model = User
-        fields = ('id','username','password')    
-        
+        fields = ('id', 'username', 'password')
+        extra_kwargs = {'password': {'write_only': True, 'required': True}}
